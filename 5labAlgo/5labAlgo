@@ -1,0 +1,138 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+//struct place {
+//    int value[100];
+//};
+int max(int a, int b) { return (a > b) ? a : b; }
+void place(int W[100][100], int n, int m) {
+    int K[100][100], right = (n - m), left = 0, maxL, maxR, r = (n - m) , l=m-1, car =1, R = (n - m), L = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            K[i][j] = 0;
+            if (i == n - 1)
+                if (j!= r-1 && j!= n-1)
+                    W[i][j] = 0;
+        }
+    }
+    cout << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << " " << W[i][j];
+        }
+        cout << endl;
+    }
+    K[0][left] = W[0][left];
+    K[0][right] = W[0][right];
+    int j = 0;
+    int j1 = R;
+    cout << endl;
+    for (int i = 1; i < n; i++) {
+        if (car >= n)
+            break;
+        else {
+            while (j <= car || j1<=right+car) {
+                if (K[i - 1][j] != 0 && K[i - 1][R] != 0) {
+                    K[i][j] = max(K[i - 1][j] + W[i][j], K[i - 1][R] + W[i][j]);
+                    R++;
+
+                }
+                else if (K[i - 1][j] != 0) {
+                    K[i][j] = K[i - 1][R] + W[i][j];
+                    R++;
+
+                }
+                if (K[i - 1][j1] != 0 && K[i - 1][L] != 0) {
+                    //K[i][j1] = K[i - 1][L] + W[i][j1];
+                    K[i][j] = max(K[i - 1][j1] + W[i][j], K[i - 1][L] + W[i][j]);
+                    L++;
+
+                }
+                else if (K[i - 1][j1] != 0) {
+                    K[i][j1] = K[i - 1][L] + W[i][j1];
+                    L++;
+
+                }
+
+                if (K[i - 1][j] == 0 && K[i - 1][j-1] != 0) {
+                    K[i][j] = K[i - 1][L - 1] + W[i][j];
+                    L++;
+                }
+
+
+                if (K[i - 1][j1] == 0 && K[i - 1][j1 - 1] != 0) {
+                    K[i][j1] = K[i - 1][R - 1] + W[i][j1];
+                    R++;
+                }
+
+
+
+                j++;
+                j1++;
+
+              //  car++;
+               /* if (car == n)
+                    break;*/
+            }
+        }
+        j = 0;
+        j1 = right;
+        car++;
+        R -= i;
+        L -= i;
+    }
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << " " << K[i][j];
+        }
+        cout << endl;
+    }
+}
+
+int main()
+{
+    ifstream f_in;
+    f_in.open("places.txt");
+    int n, m, count, j, i, z;
+    int a[100][100], b[100][100], c[100][100];
+    f_in >> n;
+    f_in >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            f_in >> a[i][j];
+    cout << "n:" << n << " " << "m:" << m << endl;
+    cout << "a:" << endl;
+   /* for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++){
+            cout << " " << a[i][j];
+    }
+        cout << endl;
+}*/
+    cout << endl;
+   for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
+        {
+            b[i][j] = 0;
+            c[i][j] = 0;
+        }
+   place(a, n, m);
+   int max=-1, temp;
+   /*for (i = 0; i < n; i++) {
+       if (n == 1) {
+           max = a[0][0] > a[0][1] ? a[0][0] : a[0][1];
+           cout << max;
+           break;
+       }
+      
+       else {
+           for (int j = 0; j < n; j++)
+           {
+
+           }
+       }
+   }*/
+   
+
+    return 0;
+}
