@@ -1,0 +1,30 @@
+#include <iostream>
+#include <Windows.h>
+#include <conio.h>
+#include <math.h>
+#include<fstream>
+
+using namespace std;
+#define INF 10000
+#define PI 3.14159265
+
+HWND hwnd = GetConsoleWindow();
+HDC dc = GetDC(hwnd);
+const COLORREF white = RGB(255, 255, 255);
+HPEN pen = CreatePen(PS_SOLID, 1, white);
+//const float alpha = 60 * PI / 180;
+//const float beta = 60 * PI / 180;
+
+int main() {
+    int n;
+    float len;
+    int beta, alpha;
+    cout << "Enter the side length of the cube:" << endl;
+    cin >> len;
+    cout << "Enter alpha:" << endl;
+    cin >> alpha;
+    cout << "Enter beta:" << endl;
+     cin >> beta;
+
+    return 0;
+}
