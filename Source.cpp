@@ -1,107 +1,145 @@
+
+#include<stdio.h>
+#include<conio.h>
 #include <iostream>
-#include <Windows.h>
-#include <conio.h>
-#include <math.h>
-#include<fstream>
+#include <fstream>
 
+#define INFINITY 9999
+#define MAX 10
 using namespace std;
-#define INF 10000
-HWND hwnd = GetConsoleWindow();
-HDC dc = GetDC(hwnd);
-const COLORREF white = RGB(255, 255, 255);
-const COLORREF yellow = RGB(255, 255, 0);
-const COLORREF green = RGB(0, 255, 0);
-HPEN pen = CreatePen(PS_SOLID, 1, green);
-HPEN pen1 = CreatePen(PS_SOLID, 1, white);
-struct Point {
-    int x;
-    int y;
+class graph {
+public:
+	int distance[MAX];
+	int pred[MAX];
+	int roud[MAX];
 };
-void drawline(int x[], int y[], int n ) {
-    CreatePen(2, 4, green);
-    SelectObject(dc, pen);
-    for (int i = 1; i < n; i++) {
-        MoveToEx(dc, x[i-1], y[i - 1], NULL);
-        LineTo(dc, x[i], y[i]);
+void dijkstra(int G[MAX][MAX], int n, int startnode);
 
-    }
-  
+int main()
+{
+	ifstream f_in;
+	f_in.open("map.txt");
+	
+	int G[MAX][MAX], i, j, n, u;
+	printf("Enter no. of vertices:");
+//	int G[MAX][MAX];
+	f_in >> n;
+	printf("\nEnter the adjacency matrix:\n");
+
+	for (i = 0; i < n; i++)
+		for (j = 0; j < n; j++)
+		
+			f_in >> G[i][j];
+
+	printf("\nEnter the starting node:");
+	
+	f_in >> u;
+	dijkstra(G, n, u);
+
+	return 0;
 }
 
-void drawPoint(int x, int y) {
+void dijkstra(int G[MAX][MAX], int n, int startnode)
+{
+	graph g1;
+	int cost[MAX][MAX];
+	int visited[MAX], count, mindistance, nextnode, i, j;
+	//int roud[MAX];
+	
+	for (i = 0; i < n; i++)
+		for (j = 0; j < n; j++)
+			if (G[i][j] == 0)
+				cost[i][j] = INFINITY;
+			else
+				cost[i][j] = G[i][j];
 
-   
+	for (i = 0; i < n; i++)
+	{
+		g1.distance[i] = cost[startnode][i];
+		g1.pred[i] = startnode;
+		visited[i] = 0;
+		g1.roud[i] = 1;
+	}
 
-    CreatePen(40, 4, green);
-    SelectObject(dc, pen1);
-    SetPixel(dc, x, y, white);
+	g1.distance[startnode] = 0;
+	visited[startnode] = 1;
+	count = 1;
 
+	while (count < n - 1)
+	{
+		mindistance = INFINITY;
+
+		//nextnode дає вершину на мінімальній відстані
+		for (i = 0; i < n; i++)
+			if (g1.distance[i] < mindistance && !visited[i])
+			{
+				mindistance = g1.distance[i];
+				nextnode = i;
+			}
+
+		//перевірити, чи існує кращий шлях через nextnode			
+		visited[nextnode] = 1;
+		for (i = 0; i < n; i++){
+			if (!visited[i])
+				if (mindistance + cost[nextnode][i] < g1.distance[i])
+				{
+					g1.distance[i] = mindistance + cost[nextnode][i];
+					g1.pred[i] = nextnode;
+					
+				
+					
+				}
+		}
+		count++;
+	}
+
+	
+	for (i = 4; i < n; i++)
+		if (i != startnode)
+		{
+			
+
+			j = i;
+			printf("%d", i);
+			do
+				
+			{
+				
+				j = g1.pred[j];
+				printf("<-%d", j);
+				g1.roud[i]++;
+			} while (j != startnode);
+		}
+	int temp = 0;
+	int index[MAX];
+	int tmp =900 ;
+	for (i = 0; i < n; i++) {
+		if (g1.roud[i] >= temp) {
+			temp = g1.roud[i];
+		}
+	
+	}
+
+	for (i = 0; i < n; i++) {
+		if (g1.roud[i] == temp) {
+			index[i] = i;
+		}
+		else
+			index[i] = 0;
+	}
+
+	for (i = 0; i < n; i++) {
+		if (index[i] != 0)
+		{
+			if (g1.distance[i] < tmp)
+			{
+				tmp = g1.distance[i];
+				temp = i;
+
+			}
+		}
+	}
+	cout << "\nDintances " << tmp << "country no " << temp << endl;
+	//cout << "Dintance min " << distance[i] << "country" << temp << endl;
 }
-int direction(Point a, Point b, Point c) {
-    int v = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
-    if (v == 0)
-        return 0; // колінеарні
-    return (v > 0) ? 1 : 2; // за або проти годинникової стрілки(під мінімальним кутом)
-}
-void convexHull(Point points[], int m) {
-    if (m < 3)//не менше 3 точок
-        return;
-    int* n = new int[m];
-    for (int i = 0; i < m; i++)
-        n[i] = -1;
-    int l = 0;
-    for (int i = 1; i < m; i++)
-        if (points[i].x < points[l].x)
-            l = i; //крайня ліва
-    int p = l, q;
-    do {
-        q = (p + 1) % m;
-         for (int i = 0; i < m; i++)
-            if (direction(points[p], points[i], points[q]) == 2)
-                q = i;
-        n[p] = q;
-        p = q;
-    } while (p != l);
-    int* x = new int[m];
-    int* y = new int[m];
-    int j = 0;
-    for (int i = 0; i < m; i++) {
-        
-        if (n[i] != -1) {
-            x[j] = points[i].x;
-            y[j] = points[i].y;
-            j++;
-        }
-          //  cout << "(" << points[i].x << ", " << points[i].y << ")\n";
-       
-    }
-    x[j] = x[0];
-    y[j] = y[0];
-    drawline(x, y, m);
-}
-int main() {
-    int n ;
-    ifstream f_in;
- //   f_in.open("points.txt");
-    f_in.open("points3.txt");
-    f_in >> n;
 
-    Point* points = new Point[n] ;
-    for (int i = 0; i < n; i++) {
-        f_in >> points[i].x;
-        f_in >> points[i].y;
-
-    }
-
-    for (int i = 0; i < n; i++) {
-        //if (n[i] != -1)
-            //  cout << "(" << points[i].x << ", " << points[i].y << ")\n";
-            drawPoint(points[i].x, points[i].y);
-    }
- //   cout << "The points in the convex hull are: ";
-   
-    convexHull(points, n);
-    ReleaseDC(hwnd, dc);
-    _getch();
-    return 0;
-}
